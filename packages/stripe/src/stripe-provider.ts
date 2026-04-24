@@ -119,8 +119,14 @@ function normalizeStripeInvoice(invoice: StripeInvoiceWithExtras) {
 
 function normalizeStripeSubscription(subscription: StripeSubscriptionWithExtras) {
   const firstItem = subscription.items.data[0];
-  const providerPriceId =
-    typeof firstItem?.price === "string" ? firstItem.price : firstItem?.price.id;
+  const price = firstItem?.price;
+  const providerPriceId = typeof price === "string" ? price : price?.id;
+  const providerProductId =
+    price && typeof price !== "string"
+      ? typeof price.product === "string"
+        ? price.product
+        : (price.product?.id ?? null)
+      : null;
   const periodStart = getEarliestPeriodStart(subscription);
   const periodEnd = getLatestPeriodEnd(subscription);
 
@@ -131,7 +137,12 @@ function normalizeStripeSubscription(subscription: StripeSubscriptionWithExtras)
     currentPeriodEndAt: toDate(periodEnd),
     currentPeriodStartAt: toDate(periodStart),
     endedAt: toDate(subscription.ended_at),
-    providerProduct: providerPriceId ? { priceId: providerPriceId } : null,
+    providerProduct:
+      providerPriceId && providerProductId
+        ? { priceId: providerPriceId, productId: providerProductId }
+        : providerPriceId
+          ? { priceId: providerPriceId }
+          : null,
     providerSubscriptionId: subscription.id,
     providerSubscriptionScheduleId:
       (typeof subscription.schedule === "string"
