@@ -5,7 +5,7 @@ import path from "node:path";
 import { Pool } from "pg";
 import { default as Stripe } from "stripe";
 
-import { env } from "../env";
+import { env } from "../test-utils/env";
 
 process.env.PAYKIT_CLI = "1";
 
