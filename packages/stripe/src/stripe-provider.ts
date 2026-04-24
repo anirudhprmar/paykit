@@ -130,6 +130,13 @@ function normalizeStripeSubscription(subscription: StripeSubscriptionWithExtras)
   const periodStart = getEarliestPeriodStart(subscription);
   const periodEnd = getLatestPeriodEnd(subscription);
 
+  let providerProduct: Record<string, string> | null = null;
+  if (providerPriceId && providerProductId) {
+    providerProduct = { priceId: providerPriceId, productId: providerProductId };
+  } else if (providerPriceId) {
+    providerProduct = { priceId: providerPriceId };
+  }
+
   const cancelAt = (subscription as { cancel_at?: number | null }).cancel_at;
   return {
     cancelAtPeriodEnd: subscription.cancel_at_period_end || (cancelAt != null && cancelAt > 0),
@@ -137,12 +144,7 @@ function normalizeStripeSubscription(subscription: StripeSubscriptionWithExtras)
     currentPeriodEndAt: toDate(periodEnd),
     currentPeriodStartAt: toDate(periodStart),
     endedAt: toDate(subscription.ended_at),
-    providerProduct:
-      providerPriceId && providerProductId
-        ? { priceId: providerPriceId, productId: providerProductId }
-        : providerPriceId
-          ? { priceId: providerPriceId }
-          : null,
+    providerProduct,
     providerSubscriptionId: subscription.id,
     providerSubscriptionScheduleId:
       (typeof subscription.schedule === "string"
@@ -977,6 +979,7 @@ export function stripe(options: StripeOptions): PayKitProviderConfig {
   }
   const client = new StripeSdk(options.secretKey, {
     apiVersion: apiVersion as StripeSdk.LatestApiVersion,
+    maxNetworkRetries: 3,
   });
 
   return {

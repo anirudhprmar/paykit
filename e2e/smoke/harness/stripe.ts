@@ -14,7 +14,7 @@ export function createStripeHarness(): ProviderHarness {
     throw new Error("E2E_STRIPE_SK and E2E_STRIPE_WHSEC must be set");
   }
 
-  const stripeClient = new Stripe(secretKey);
+  const stripeClient = new Stripe(secretKey, { maxNetworkRetries: 3 });
 
   return {
     id: "stripe",

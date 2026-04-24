@@ -20,8 +20,7 @@ import { syncProducts } from "../../packages/paykit/src/product/product-sync.ser
 import { env } from "../env";
 import { loadHarness } from "./harness/index";
 import type { ProviderHarness } from "./harness/types";
-
-const WEBHOOK_PORT = 4567;
+import { HUB_PORT, registerCustomer, unregisterCustomers } from "./hub";
 
 // Provider harness — loaded once at module init based on PROVIDER env var
 export const harness: ProviderHarness = loadHarness();
@@ -92,6 +91,7 @@ export interface TestPayKit {
   harness: ProviderHarness;
   dbPath: string;
   server: Server;
+  workerUrl: string;
   webhookRequests: CapturedWebhookRequest[];
   cleanup: () => Promise<void>;
 }
@@ -110,7 +110,7 @@ export async function createTestPayKit(): Promise<TestPayKit> {
   harness.validateEnv();
 
   // 1. Create a fresh test database
-  const dbName = `paykit_smoke_${String(Date.now())}`;
+  const dbName = `paykit_smoke_${String(Date.now())}_${Math.random().toString(36).slice(2, 8)}`;
   const adminPool = new Pool({
     connectionString: env.TEST_DATABASE_URL,
   });
@@ -138,7 +138,7 @@ export async function createTestPayKit(): Promise<TestPayKit> {
   // This allows direct subscription without client-side payment confirmation.
   if (harness.id === "stripe") {
     const secretKey = env.E2E_STRIPE_SK!;
-    const stripeClient = new Stripe(secretKey);
+    const stripeClient = new Stripe(secretKey, { maxNetworkRetries: 3 });
 
     (ctx.provider as unknown as Record<string, unknown>).createSubscription = async (data: {
       providerCustomerId: string;
@@ -189,12 +189,14 @@ export async function createTestPayKit(): Promise<TestPayKit> {
     };
   }
 
-  // 4. Start webhook server BEFORE syncing products — product sync
-  // creates provider products which fires webhooks immediately
+  // 4. Start per-test webhook server on a random free port. A shared hub on 4567
+  // (started in globalSetup) forwards webhooks to this worker by provider customer ID.
   const webhookRequests: CapturedWebhookRequest[] = [];
-  const server = await startWebhookServer(paykit, webhookRequests);
+  const { server, workerUrl } = await startWebhookServer(paykit, webhookRequests);
 
-  // 5. Sync products to provider
+  // 5. Sync products to provider. These fire product.created/price.created events
+  // which the hub drops (they don't carry a customer ID) — safe to run before
+  // any customer is registered.
   await syncProducts(ctx);
 
   return {
@@ -204,6 +206,7 @@ export async function createTestPayKit(): Promise<TestPayKit> {
     harness,
     dbPath: dbUrl,
     server,
+    workerUrl,
     webhookRequests,
     cleanup: async () => {
       const customerRows = await ctx.database.query.customer.findMany();
@@ -218,6 +221,7 @@ export async function createTestPayKit(): Promise<TestPayKit> {
 
       // Wait for cleanup webhooks to arrive and be processed
       await new Promise((resolve) => setTimeout(resolve, 10_000));
+      await unregisterCustomers([...idSet]);
       await new Promise<void>((resolve) => server.close(() => resolve()));
       await pool.end();
       // Drop the test database
@@ -261,6 +265,9 @@ export async function createTestCustomer(input: {
     );
   }
 
+  // Route this customer's webhooks to this test's worker
+  await registerCustomer(providerCustomerId, input.t.workerUrl);
+
   return { customerId: uniqueId, providerCustomerId };
 }
 
@@ -280,7 +287,7 @@ export async function createTestCustomerWithPM(input: {
   // For Stripe, sync the payment method into PayKit DB
   if (input.t.harness.id === "stripe") {
     const secretKey = env.E2E_STRIPE_SK!;
-    const stripeClient = new Stripe(secretKey);
+    const stripeClient = new Stripe(secretKey, { maxNetworkRetries: 3 });
     const pm = await stripeClient.paymentMethods.list({
       customer: providerCustomerId,
       type: "card",
@@ -607,7 +614,7 @@ export async function expectExactMeteredBalance(input: {
 async function startWebhookServer(
   paykit: Pick<SmokePayKit, "handler">,
   webhookRequests: CapturedWebhookRequest[],
-): Promise<Server> {
+): Promise<{ server: Server; workerUrl: string }> {
   const server = createServer(async (req: IncomingMessage, res: ServerResponse) => {
     const chunks: Buffer[] = [];
     for await (const chunk of req) {
@@ -615,7 +622,9 @@ async function startWebhookServer(
     }
     const body = Buffer.concat(chunks).toString();
 
-    const url = new URL(req.url ?? "/", `http://localhost:${String(WEBHOOK_PORT)}`);
+    const address = server.address();
+    const port = typeof address === "object" && address ? address.port : 0;
+    const url = new URL(req.url ?? "/", `http://127.0.0.1:${String(port)}`);
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {
       if (typeof value === "string") headers.set(key, value);
@@ -646,9 +655,14 @@ async function startWebhookServer(
 
   await new Promise<void>((resolve, reject) => {
     server.once("error", reject);
-    server.listen(WEBHOOK_PORT, () => resolve());
+    server.listen(0, "127.0.0.1", () => resolve());
   });
-  return server;
+  const address = server.address();
+  if (typeof address !== "object" || !address) {
+    throw new Error("Failed to get webhook server address");
+  }
+  const workerUrl = `http://127.0.0.1:${String(address.port)}/`;
+  return { server, workerUrl };
 }
 
 export async function advanceTestClock(input: {
@@ -737,7 +751,8 @@ export async function waitForForwardedWebhookRequest(input: {
 export async function replayWebhookRequest(input: {
   request: CapturedWebhookRequest;
 }): Promise<void> {
-  const response = await fetch(`http://localhost:${String(WEBHOOK_PORT)}${input.request.path}`, {
+  // Replay goes through the hub, which routes to the owning worker by customer ID.
+  const response = await fetch(`http://127.0.0.1:${String(HUB_PORT)}${input.request.path}`, {
     body: input.request.body,
     headers: input.request.headers,
     method: "POST",

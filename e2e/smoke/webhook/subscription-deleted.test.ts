@@ -22,7 +22,7 @@ describe.skipIf(harness.id !== "stripe")(
     let t: TestPayKit;
     let customerId: string;
     let providerSubscriptionId: string;
-    const stripeClient = new Stripe(env.E2E_STRIPE_SK!);
+    const stripeClient = new Stripe(env.E2E_STRIPE_SK!, { maxNetworkRetries: 3 });
 
     beforeAll(async () => {
       t = await createTestPayKit();
