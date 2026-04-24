@@ -98,9 +98,8 @@ describe("resubscribe-after-cancel: checkout after full cancellation", () => {
         throw new Error("Expected checkout URL but got direct subscription");
       }
 
-      console.log("\n\n  ▶ Complete checkout at:\n  " + result.paymentUrl + "\n");
+      await t.harness.completeCheckout(result.paymentUrl);
 
-      // Wait for manual checkout completion
       await waitForWebhook({
         database: t.database,
         eventType: "checkout.completed",

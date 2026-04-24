@@ -1,4 +1,5 @@
 import { stripe } from "@paykitjs/stripe";
+import { chromium } from "playwright";
 import { default as Stripe } from "stripe";
 
 import type { PayKitDatabase } from "../../../packages/paykit/src/database/index";
@@ -35,8 +36,46 @@ export function createStripeHarness(): ProviderHarness {
       });
     },
 
-    async completeCheckout(_url: string) {
-      throw new Error("Stripe direct-subscription tests should not need checkout completion");
+    async completeCheckout(url: string) {
+      const browser = await chromium.launch({ headless: true });
+      const page = await browser.newPage();
+
+      try {
+        await page.goto(url, { waitUntil: "domcontentloaded" });
+
+        // Stripe's hosted checkout uses custom inputs that require per-key events;
+        // fill() does not dispatch them correctly, so use pressSequentially.
+        const cardNumber = page.locator("#cardNumber");
+        await cardNumber.waitFor({ timeout: 60_000 });
+        await cardNumber.pressSequentially("4242424242424242");
+
+        const cardExpiry = page.locator("#cardExpiry");
+        await cardExpiry.waitFor({ timeout: 30_000 });
+        await cardExpiry.pressSequentially("1234");
+
+        const cardCvc = page.locator("#cardCvc");
+        await cardCvc.waitFor({ timeout: 30_000 });
+        await cardCvc.pressSequentially("123");
+
+        const billingName = page.locator("#billingName");
+        if (await billingName.isVisible().catch(() => false)) {
+          await billingName.pressSequentially("Test Customer");
+        }
+
+        const submitBtn = page.locator(".SubmitButton-TextContainer").first();
+        await submitBtn.evaluate((el) => (el as HTMLElement).click());
+
+        // Wait for Stripe to navigate away from the checkout page (success redirect
+        // or embedded confirmation). Don't fail the test if this times out — the
+        // webhook poll downstream is the real signal.
+        await page
+          .waitForURL((u) => !u.toString().includes("checkout.stripe.com"), {
+            timeout: 60_000,
+          })
+          .catch(() => {});
+      } finally {
+        await browser.close();
+      }
     },
 
     async cleanup(ctx) {

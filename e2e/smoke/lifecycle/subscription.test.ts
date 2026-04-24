@@ -169,10 +169,8 @@ describe("subscription lifecycle", () => {
       // No payment method → should return checkout URL
       expect(result.paymentUrl).not.toBeNull();
 
-      // Log the checkout URL for manual completion
-      console.log("\n\n  ▶ Complete checkout at:\n  " + result.paymentUrl + "\n");
+      await t.harness.completeCheckout(result.paymentUrl!);
 
-      // Wait for checkout.completed webhook after manual completion
       await waitForWebhook({
         database: t.database,
         eventType: "checkout.completed",
@@ -386,7 +384,7 @@ describe("subscription lifecycle", () => {
       // After full cancellation, Stripe clears the payment method.
       // Customer must go through checkout again.
       expect(result.paymentUrl).not.toBeNull();
-      console.log("\n\n  ▶ Complete checkout at:\n  " + result.paymentUrl + "\n");
+      await t.harness.completeCheckout(result.paymentUrl!);
       await waitForWebhook({
         database: t.database,
         eventType: "checkout.completed",

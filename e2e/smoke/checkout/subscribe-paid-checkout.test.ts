@@ -11,7 +11,7 @@ import {
   waitForWebhook,
 } from "../setup";
 
-describe("subscribe-paid-checkout: free → pro via checkout (manual)", () => {
+describe("subscribe-paid-checkout: free → pro via checkout", () => {
   let t: TestPayKit;
   let customerId: string;
 
@@ -33,7 +33,7 @@ describe("subscribe-paid-checkout: free → pro via checkout (manual)", () => {
     await t?.cleanup();
   });
 
-  it("subscribing without a payment method returns a checkout URL, completing it activates the plan", async () => {
+  it("subscribing without a payment method returns a checkout URL; completing it activates the plan", async () => {
     try {
       const beforeCheckout = new Date();
 
@@ -48,9 +48,8 @@ describe("subscribe-paid-checkout: free → pro via checkout (manual)", () => {
         throw new Error("Expected checkout URL but got direct subscription");
       }
 
-      console.log("\n\n  ▶ Complete checkout at:\n  " + result.paymentUrl + "\n");
+      await t.harness.completeCheckout(result.paymentUrl);
 
-      // Wait for checkout.completed webhook (manual completion required)
       await waitForWebhook({
         database: t.database,
         eventType: "checkout.completed",
