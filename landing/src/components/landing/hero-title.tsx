@@ -30,7 +30,7 @@ export function HeroTitle() {
           </span>
         </div>
         <h1 className="max-w-4xl text-3xl leading-tight tracking-tight text-neutral-800 sm:text-3xl md:text-3xl lg:text-[2.5rem] dark:text-neutral-200">
-          The first billing framework <br />
+          The billing framework <br />
           for <span className="border-foreground/20 border-b border-dashed">TypeScript</span>
         </h1>
 
