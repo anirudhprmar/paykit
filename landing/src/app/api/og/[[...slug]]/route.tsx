@@ -11,7 +11,7 @@ export function generateStaticParams() {
 }
 
 const ogBlankDataUrl = `data:image/png;base64,${(
-  await readFile(join(process.cwd(), "public", "og-blank.png"))
+  await readFile(join(process.cwd(), "public", "brand", "og-blank.png"))
 ).toString("base64")}`;
 
 export const GET = async (req: Request, { params }: { params: Promise<{ slug?: string[] }> }) => {
