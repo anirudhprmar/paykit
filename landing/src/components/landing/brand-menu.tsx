@@ -42,7 +42,7 @@ export function BrandMenu() {
           className="flex items-center"
           render={
             <Link ref={logoRef} href="/" className="flex items-center py-1.5">
-              <Wordmark className="h-5 scale-105" />
+              <Wordmark className="h-5 origin-left scale-105" />
             </Link>
           }
         />
