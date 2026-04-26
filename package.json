@@ -48,8 +48,10 @@
     "pre-commit": "bun lint-staged"
   },
   "lint-staged": {
-    "!(**/migrations/**)": "oxlint --fix",
-    "*.{ts,tsx,js,jsx}": "oxfmt --write"
+    "*.{ts,tsx,js,jsx}": [
+      "oxlint --fix",
+      "oxfmt --write"
+    ]
   },
   "engines": {
     "node": ">=22"
