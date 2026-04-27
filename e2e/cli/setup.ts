@@ -5,7 +5,7 @@ import path from "node:path";
 import { Pool } from "pg";
 import { default as Stripe } from "stripe";
 
-import { env } from "../env";
+import { env } from "../test-utils/env";
 
 process.env.PAYKIT_CLI = "1";
 
@@ -32,7 +32,7 @@ export async function createCliFixture(_globalKey: string): Promise<CliTestFixtu
     throw new Error("E2E_STRIPE_SK and E2E_STRIPE_WHSEC must be set");
   }
 
-  const stripeClient = new Stripe(secretKey);
+  const stripeClient = new Stripe(secretKey, { maxNetworkRetries: 3 });
 
   // Create a fresh test database
   const dbName = `paykit_cli_${String(Date.now())}`;

@@ -3,14 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "vitest run --config smoke/vitest.automated.config.ts",
-    "test:stripe": "PROVIDER=stripe vitest run --config smoke/vitest.automated.config.ts",
-    "test:polar": "PROVIDER=polar vitest run --config smoke/vitest.automated.config.ts",
-    "test:watch": "vitest --config smoke/vitest.automated.config.ts",
-    "test:manual": "vitest run --config smoke/vitest.manual.config.ts",
-    "test:all": "vitest run --config smoke/vitest.config.ts",
-    "test:cli": "vitest run --config cli/vitest.config.ts",
-    "test:cli:watch": "vitest --config cli/vitest.config.ts",
+    "test:stripe": "PROVIDER=stripe vitest run --project=core",
+    "test:stripe:watch": "PROVIDER=stripe vitest --project=core",
+    "test:polar": "PROVIDER=polar vitest run --project=core",
+    "test:polar:watch": "PROVIDER=polar vitest --project=core",
+    "test:cli": "vitest run --project=cli",
+    "test:cli:watch": "vitest --project=cli",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
