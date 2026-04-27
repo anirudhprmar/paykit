@@ -1,103 +1,11 @@
 import { stripe } from "@paykitjs/stripe";
-import { chromium, type Locator, type Page } from "playwright";
+import { chromium } from "playwright";
 import { default as Stripe } from "stripe";
 
 import type { PayKitDatabase } from "../../../packages/paykit/src/database/index";
 import { syncPaymentMethodByProviderCustomer } from "../../../packages/paykit/src/payment-method/payment-method.service";
 import { env } from "../env";
 import type { ProviderHarness } from "./types";
-
-const stripeCardNumberSelectors = [
-  "#cardNumber",
-  'input[name="cardnumber"]',
-  'input[autocomplete="cc-number"]',
-  'input[placeholder*="card number" i]',
-  '[data-testid="card-number"]',
-];
-
-const stripeCardExpirySelectors = [
-  "#cardExpiry",
-  'input[name="exp-date"]',
-  'input[autocomplete="cc-exp"]',
-  'input[placeholder*="MM / YY" i]',
-  '[data-testid="card-expiry"]',
-];
-
-const stripeCardCvcSelectors = [
-  "#cardCvc",
-  'input[name="cvc"]',
-  'input[autocomplete="cc-csc"]',
-  'input[placeholder*="CVC" i]',
-  '[data-testid="card-cvc"]',
-];
-
-const stripeBillingNameSelectors = [
-  "#billingName",
-  'input[name="name"]',
-  'input[autocomplete="cc-name"]',
-  '[data-testid="billing-name"]',
-];
-
-const stripeSubmitSelectors = [
-  'button[type="submit"]',
-  'button:has-text("Subscribe")',
-  'button:has-text("Pay")',
-  'button:has-text("Start trial")',
-  ".SubmitButton-TextContainer",
-];
-
-async function waitForVisibleLocator(
-  page: Page,
-  selectors: string[],
-  timeout: number,
-): Promise<Locator> {
-  const deadline = Date.now() + timeout;
-
-  while (Date.now() < deadline) {
-    for (const context of [page, ...page.frames()]) {
-      for (const selector of selectors) {
-        const locator = context.locator(selector).first();
-        if (await locator.isVisible().catch(() => false)) {
-          return locator;
-        }
-      }
-    }
-
-    await page.waitForTimeout(500);
-  }
-
-  const frameUrls = page
-    .frames()
-    .map((frame) => frame.url())
-    .filter(Boolean)
-    .join("\n- ");
-
-  throw new Error(
-    [
-      `Timed out waiting for Stripe checkout selectors: ${selectors.join(", ")}`,
-      `Page URL: ${page.url()}`,
-      frameUrls ? `Frames:\n- ${frameUrls}` : "Frames: (none)",
-    ].join("\n"),
-  );
-}
-
-async function maybeGetVisibleLocator(
-  page: Page,
-  selectors: string[],
-  timeout: number,
-): Promise<Locator | null> {
-  try {
-    return await waitForVisibleLocator(page, selectors, timeout);
-  } catch {
-    return null;
-  }
-}
-
-async function fillStripeField(page: Page, selectors: string[], value: string, timeout: number) {
-  const locator = await waitForVisibleLocator(page, selectors, timeout);
-  await locator.click();
-  await locator.pressSequentially(value);
-}
 
 export function createStripeHarness(): ProviderHarness {
   const secretKey = env.E2E_STRIPE_SK;
@@ -187,24 +95,28 @@ export function createStripeHarness(): ProviderHarness {
 
       try {
         await page.goto(url, { waitUntil: "domcontentloaded" });
-        await page.waitForLoadState("load").catch(() => {});
 
         // Stripe's hosted checkout uses custom inputs that require per-key events;
-        // fill() does not dispatch them correctly, so use pressSequentially. In
-        // CI Stripe sometimes renders these fields inside iframes rather than as
-        // top-level inputs, so search both the page and all frames.
-        await fillStripeField(page, stripeCardNumberSelectors, "4242424242424242", 60_000);
-        await fillStripeField(page, stripeCardExpirySelectors, "1234", 30_000);
-        await fillStripeField(page, stripeCardCvcSelectors, "123", 30_000);
+        // fill() does not dispatch them correctly, so use pressSequentially.
+        const cardNumber = page.locator("#cardNumber");
+        await cardNumber.waitFor({ timeout: 60_000 });
+        await cardNumber.pressSequentially("4242424242424242");
 
-        const billingName = await maybeGetVisibleLocator(page, stripeBillingNameSelectors, 5_000);
-        if (billingName) {
-          await billingName.click();
+        const cardExpiry = page.locator("#cardExpiry");
+        await cardExpiry.waitFor({ timeout: 30_000 });
+        await cardExpiry.pressSequentially("1234");
+
+        const cardCvc = page.locator("#cardCvc");
+        await cardCvc.waitFor({ timeout: 30_000 });
+        await cardCvc.pressSequentially("123");
+
+        const billingName = page.locator("#billingName");
+        if (await billingName.isVisible().catch(() => false)) {
           await billingName.pressSequentially("Test Customer");
         }
 
-        const submitBtn = await waitForVisibleLocator(page, stripeSubmitSelectors, 30_000);
-        await submitBtn.click({ force: true });
+        const submitBtn = page.locator(".SubmitButton-TextContainer").first();
+        await submitBtn.evaluate((el) => (el as HTMLElement).click());
 
         // Wait for Stripe to navigate away from the checkout page (success redirect
         // or embedded confirmation). Don't fail the test if this times out — the
