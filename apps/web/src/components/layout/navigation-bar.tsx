@@ -6,7 +6,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { Wordmark } from "@/components/icons/wordmark";
 import { SectionShell } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
 import { BrandMenu } from "@/components/web/brand-menu";
