@@ -31,11 +31,11 @@ Run specific tests with `vitest /path/to/<test-file> -t <pattern>`, not `bun tes
 - **Linter**: oxlint 1.51 | **Formatter**: oxfmt 0.36 | **Validation**: Zod 4
 - **Git hooks**: simple-git-hooks + lint-staged (runs `oxlint --fix` + `oxfmt --write` on commit)
 
-### Landing Page
+### Web App
 
 - **Framework**: Next.js (App Router) | **Styling**: Tailwind CSS v4
 - **Animations**: Framer Motion | **Components**: shadcn/ui + fumadocs-ui
-- **Code highlighting**: Shiki with custom Vercel Dark theme (`landing/src/lib/shiki-vercel-theme.ts`), applied as default in `DynamicCodeBlock`
+- **Code highlighting**: Shiki with custom Vercel Dark theme (`apps/web/src/lib/shiki-vercel-theme.ts`), applied as default in `DynamicCodeBlock`
 
 ## Code Style
 
@@ -56,12 +56,6 @@ Enforced by oxlint, oxfmt, and TypeScript config. Follow strictly.
 Do not write comments separating sections like this:
 // ---------------------------------------------------------------------------
 The only comments you may write should be JSDoc, inlilne clarifying comments, preferable very short and under one line. Only if necessary
-
-## Landing Page Conventions
-
-- Use CSS variables for theme colors (`bg-background`, `bg-card`) — never hardcode hex in components
-- Use standard Tailwind sizes (`text-xs`, `text-sm`, `text-base`) — avoid arbitrary pixel values
-- Dark theme uses oklch color space with neutral grays (no chroma)
 
 ## Git & Testing
 

@@ -1,0 +1,27 @@
+import { useId } from "react";
+
+export const LOGO_SVG = `<svg width="114" height="123" viewBox="0 0 114 123" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 76H67V123H0V76Z" fill="white"/>
+<path d="M67 47H0V0H114V76H67V47Z" fill="white"/>
+</svg>`;
+
+export function Logo({ title, ...props }: React.ComponentProps<"svg"> & { title?: string | null }) {
+  const titleId = useId();
+  const hasTitle = title != null;
+
+  return (
+    <svg
+      viewBox="0 0 114 123"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      aria-labelledby={hasTitle ? titleId : undefined}
+      aria-hidden={hasTitle ? undefined : true}
+      {...props}
+    >
+      {hasTitle ? <title id={titleId}>{title}</title> : null}
+      <path d="M0 76H67V123H0V76Z" fill="currentColor" />
+      <path d="M67 47H0V0H114V76H67V47Z" fill="currentColor" />
+    </svg>
+  );
+}
