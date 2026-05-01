@@ -75,12 +75,12 @@ export interface ProductDiff {
 
 export function formatProductDiffs(
   diffs: ProductDiff[],
-  plans: readonly NormalizedPlan[],
+  products: readonly NormalizedPlan[],
   deps: Pick<CliDeps, "formatPlanLine" | "formatPrice">,
 ): string[] {
-  const plansById = new Map(plans.map((pl) => [pl.id, pl]));
+  const productsById = new Map(products.map((pl) => [pl.id, pl]));
   return diffs.map((diff) => {
-    const plan = plansById.get(diff.id);
+    const plan = productsById.get(diff.id);
     const price = plan ? deps.formatPrice(plan.priceAmount ?? 0, plan.priceInterval) : "$0";
     return deps.formatPlanLine(diff.action, diff.id, price);
   });

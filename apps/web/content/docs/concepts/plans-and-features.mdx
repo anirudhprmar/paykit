@@ -9,7 +9,7 @@ Plans are the core billing unit in PayKit. They define what customers subscribe 
 
 A feature is either a boolean access gate or a metered usage limit. You define it once and reuse it across plans.
 
-```ts title="plans.ts"
+```ts title="products.ts"
 import { feature, plan } from "paykitjs";
 
 // Boolean feature: grants access to something
@@ -48,7 +48,7 @@ The `reset` interval can be `day`, `week`, `month`, or `year`.
 
 Use `plan()` to define a plan. Every plan needs an `id`. Everything else is optional, but you'll almost always want `group`, `includes`, and either `default: true` or a `price`.
 
-```ts title="plans.ts"
+```ts title="products.ts"
 export const free = plan({
   id: "free",
   name: "Free",
@@ -125,16 +125,16 @@ price: { amount: 19, interval: "month" }
 - `interval` can be `month` or `year`
 - `amount` is in dollars, max $999,999.99
 
-## Passing plans to PayKit
+## Passing products to PayKit
 
-Pass your plans array to `createPayKit`. You can import them directly or re-export them from a module object.
+Pass your products array to `createPayKit`. You can import them directly or re-export them from a module object.
 
 ```ts title="paykit.ts"
-import { free, pro, ultra } from "./plans";
+import { free, pro, ultra } from "./products";
 
 export const paykit = createPayKit({
   // ...
-  plans: [free, pro, ultra],
+  products: [free, pro, ultra],
 });
 
 // Plan and feature IDs are now type-safe:
@@ -144,6 +144,6 @@ await paykit.subscribe({ customerId: "user_123", planId: "typo" }); // ✗ type 
 
 ## Type inference
 
-PayKit infers plan IDs and feature IDs from your `plans` array. Typos are caught at compile time, so `planId: "proe"` or `featureId: "mesages"` won't compile.
+PayKit infers plan IDs and feature IDs from your `products` array. Typos are caught at compile time, so `planId: "proe"` or `featureId: "mesages"` won't compile.
 
 This also means your editor's autocomplete knows every valid plan and feature ID across the whole app.

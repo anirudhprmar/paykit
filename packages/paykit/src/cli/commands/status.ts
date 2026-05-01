@@ -45,7 +45,7 @@ async function statusAction(options: {
     process.exit(1);
   }
 
-  const planCount = config.options.plans ? Object.values(config.options.plans).length : 0;
+  const planCount = config.options.products ? Object.values(config.options.products).length : 0;
   const hasProvider = Boolean(config.options.provider);
 
   if (!hasProvider) {
@@ -128,7 +128,7 @@ async function statusAction(options: {
         ? `${picocolors.green("✔")} All synced`
         : `${picocolors.red("✖")} Not synced (run ${picocolors.bold(pushCmd)})`;
 
-      const planLines = formatProductDiffs(diffs, ctx.plans.plans, deps);
+      const planLines = formatProductDiffs(diffs, ctx.products.plans, deps);
       productsBlock = `Products\n  ${header}\n${planLines.join("\n")}`;
     }
   }

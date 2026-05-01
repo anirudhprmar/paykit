@@ -21,7 +21,7 @@ export const paykit = createPayKit({
     webhookSecret: env.POLAR_WEBHOOK_SECRET,
     server: "sandbox",
   }),
-  plans: [pro, ultra, free],
+  products: [pro, ultra, free],
   plugins: [
     dash({
       // authorize: async (request) => {

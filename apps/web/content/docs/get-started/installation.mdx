@@ -180,7 +180,7 @@ Optionally. PayKit provides a code-first way to create your plans, and a very us
 By defining you products in code don't have to touch Stripe's dashboard at all. It automatically syncs your pricing with your provider, and you unlock a full type-safety with inferred ID types!
 
 
-```ts title="plans.ts"
+```ts title="products.ts"
 import { feature, plan } from "paykitjs";
 
 const messages = feature({ id: "messages", type: "metered" });
@@ -208,14 +208,14 @@ export const pro = plan({
 });
 ```
 
-Then pass your plans to the main options:
+Then pass your products to the main options:
 
 ```ts title="paykit.ts"
-import { free, pro } from "./plans";
+import { free, pro } from "./products";
 
 export const paykit = createPayKit({
   // ...
-  plans: [free, pro],
+  products: [free, pro],
 });
 ```
 

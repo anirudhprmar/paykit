@@ -147,9 +147,9 @@ export interface NormalizedSchema {
   planMap: ReadonlyMap<string, NormalizedPlan>;
 }
 
-export type PayKitPlansModule = readonly PayKitPlan[];
+export type PayKitProductsModule = readonly PayKitPlan[];
 
-export type PlanIdFromPlans<TPlans> = TPlans extends readonly (infer TItem)[]
+export type PlanIdFromProducts<TProducts> = TProducts extends readonly (infer TItem)[]
   ? TItem extends PayKitPlan<PayKitPlanConfig<infer TId>>
     ? TId
     : never
@@ -163,7 +163,7 @@ type ExtractFeatureIds<TPlan> = TPlan extends {
     : never
   : never;
 
-export type FeatureIdFromPlans<TPlans> = TPlans extends readonly (infer TItem)[]
+export type FeatureIdFromProducts<TProducts> = TProducts extends readonly (infer TItem)[]
   ? ExtractFeatureIds<TItem>
   : never;
 
@@ -336,8 +336,8 @@ export function computePlanHash(plan: Omit<NormalizedPlan, "hash">): string {
   return createHash("sha256").update(payload).digest("hex").slice(0, 16);
 }
 
-export function normalizeSchema(plans: PayKitPlansModule | undefined): NormalizedSchema {
-  if (!plans) {
+export function normalizeSchema(products: PayKitProductsModule | undefined): NormalizedSchema {
+  if (!products) {
     return {
       features: [],
       plans: [],
@@ -345,11 +345,13 @@ export function normalizeSchema(plans: PayKitPlansModule | undefined): Normalize
     };
   }
 
-  if (!Array.isArray(plans)) {
-    throw new Error("Invalid `plans` export. Expected an array of values returned by plan(...).");
+  if (!Array.isArray(products)) {
+    throw new Error(
+      "Invalid `products` export. Expected an array of values returned by plan(...).",
+    );
   }
 
-  const exportedPlans = plans.map((planValue, index) => {
+  const exportedPlans = products.map((planValue, index) => {
     if (!isPayKitPlan(planValue)) {
       throw new Error(`Invalid plan at index ${index}. Expected values returned by plan(...).`);
     }
@@ -361,7 +363,7 @@ export function normalizeSchema(plans: PayKitPlansModule | undefined): Normalize
 
   for (const exportedPlan of exportedPlans) {
     if (plansById.has(exportedPlan.id)) {
-      throw new Error(`Duplicate plan id "${exportedPlan.id}" found in plans exports.`);
+      throw new Error(`Duplicate plan id "${exportedPlan.id}" found in products exports.`);
     }
 
     const group = exportedPlan.group ?? "";

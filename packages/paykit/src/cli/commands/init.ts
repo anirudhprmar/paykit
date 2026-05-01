@@ -61,8 +61,8 @@ function generateConfigFile(templateId: string, includeIdentify: boolean): strin
   const planImports =
     templateId === "saas-starter" ? "free, pro" : templateId === "usage-based" ? "free, pro" : "";
 
-  const plansLine = planImports ? `\n  plans: [${planImports}],` : "\n  plans: [],";
-  const importLine = planImports ? `\nimport { ${planImports} } from "./paykit-plans";` : "";
+  const productsLine = planImports ? `\n  products: [${planImports}],` : "\n  products: [],";
+  const importLine = planImports ? `\nimport { ${planImports} } from "./paykit-products";` : "";
 
   const identifyBlock = includeIdentify
     ? `
@@ -87,7 +87,7 @@ export const paykit = createPayKit({
   provider: stripe({
     secretKey: process.env.STRIPE_SECRET_KEY!,
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
-  }),${plansLine}${identifyBlock}
+  }),${productsLine}${identifyBlock}
 });
 `;
 }
@@ -354,11 +354,11 @@ async function initAction(options: { cwd: string; defaults: boolean }): Promise<
     }
   }
 
-  const plansPath = configPath.replace(/paykit(\.config)?\.ts$/, "paykit-plans.ts");
-  const plansFullPath = path.join(cwd, plansPath);
+  const productsPath = configPath.replace(/paykit(\.config)?\.ts$/, "paykit-products.ts");
+  const productsFullPath = path.join(cwd, productsPath);
   let templateId: string | symbol = "saas-starter";
 
-  if (!fs.existsSync(plansFullPath) && !useDefaults) {
+  if (!fs.existsSync(productsFullPath) && !useDefaults) {
     templateId = await p.select({
       message: "Select pricing template",
       options: templates.map((t) => ({
@@ -406,10 +406,10 @@ async function initAction(options: { cwd: string; defaults: boolean }): Promise<
   }
 
   // Plans
-  if (!fs.existsSync(plansFullPath)) {
+  if (!fs.existsSync(productsFullPath)) {
     const template = templates.find((t) => t.id === templateId);
     if (template) {
-      files.push({ path: plansPath, content: template.content });
+      files.push({ path: productsPath, content: template.content });
     }
   }
 

@@ -48,4 +48,4 @@ export const extraMessagesPlan = plan({
   price: { amount: 5, interval: "month" },
 });
 
-export const allPlans = [freePlan, proPlan, premiumPlan, ultraPlan, extraMessagesPlan] as const;
+export const allProducts = [freePlan, proPlan, premiumPlan, ultraPlan, extraMessagesPlan] as const;

@@ -41,7 +41,7 @@ describe("paykitjs status", () => {
     const config = await getPayKitConfig({ cwd: fixture.cwd });
     const database = resolveDatabase(config.options.database);
     try {
-      const planCount = config.options.plans ? Object.values(config.options.plans).length : 0;
+      const planCount = config.options.products ? Object.values(config.options.products).length : 0;
       expect(planCount).toBe(2);
       expect(config.options.provider).toBeTruthy();
     } finally {
