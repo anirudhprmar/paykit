@@ -110,7 +110,7 @@ describe("customer/service", () => {
         },
         testing: { enabled: true },
       },
-      plans: { plans: [] },
+      products: { plans: [] },
       provider: {
         capabilities: { testClocks: true },
         id: "stripe",
@@ -206,7 +206,7 @@ describe("customer/service", () => {
           createAdapter: vi.fn(),
         },
       },
-      plans: { plans: [] },
+      products: { plans: [] },
       provider: {
         capabilities: { testClocks: true },
         id: "stripe",
@@ -382,7 +382,7 @@ describe("customer/service", () => {
       options: {
         provider: { id: "stripe", name: "Stripe", createAdapter: vi.fn() },
       },
-      plans: { plans: [] },
+      products: { plans: [] },
       provider: providerMock,
     } as unknown as PayKitContext;
 
@@ -435,7 +435,7 @@ describe("customer/service", () => {
       options: {
         provider: { id: "stripe", name: "Stripe", createAdapter: vi.fn() },
       },
-      plans: { plans: [] },
+      products: { plans: [] },
       provider: providerMock,
     } as unknown as PayKitContext;
 
@@ -482,7 +482,7 @@ describe("customer/service", () => {
       options: {
         provider: { id: "stripe", name: "Stripe", createAdapter: vi.fn() },
       },
-      plans: { plans: [] },
+      products: { plans: [] },
       provider: providerMock,
     } as unknown as PayKitContext;
 

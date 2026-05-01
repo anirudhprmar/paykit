@@ -11,23 +11,23 @@ import type {
 } from "../api/methods";
 import type { PayKitContext } from "../core/context";
 import type { PayKitOptions } from "./options";
-import type { FeatureIdFromPlans, PlanIdFromPlans } from "./schema";
+import type { FeatureIdFromProducts, PlanIdFromProducts } from "./schema";
 
 type RegisteredMethods = typeof registeredMethods;
 type RegisteredMethodKey = keyof RegisteredMethods;
 type RegisteredTestingMethodKey = keyof typeof registeredTestingMethods;
 
 type PlanIdFromOptions<TOptions extends PayKitOptions> = [
-  PlanIdFromPlans<TOptions["plans"]>,
+  PlanIdFromProducts<TOptions["products"]>,
 ] extends [never]
   ? string
-  : PlanIdFromPlans<TOptions["plans"]>;
+  : PlanIdFromProducts<TOptions["products"]>;
 
 type FeatureIdFromOptions<TOptions extends PayKitOptions> = [
-  FeatureIdFromPlans<TOptions["plans"]>,
+  FeatureIdFromProducts<TOptions["products"]>,
 ] extends [never]
   ? string
-  : FeatureIdFromPlans<TOptions["plans"]>;
+  : FeatureIdFromProducts<TOptions["products"]>;
 
 type InferMethodInput<TMethod> =
   TMethod extends DefinedPayKitMethod<infer TInput, unknown> ? TInput : never;

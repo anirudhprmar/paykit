@@ -30,18 +30,18 @@ async function createInitFixture() {
 }
 
 describe("paykitjs init", () => {
-  it("should generate config, plans, route handler, and .env", async () => {
+  it("should generate config, products, route handler, and .env", async () => {
     const { cwd } = await createInitFixture();
 
     const configPath = "src/lib/paykit.ts";
-    const plansPath = "src/lib/paykit-plans.ts";
+    const productsPath = "src/lib/paykit-products.ts";
     const routePath = "src/app/api/paykit/[...slug]/route.ts";
     const envPath = ".env";
 
     // Write config file
     const configContent = `import { stripe } from "@paykitjs/stripe";
 import { createPayKit } from "paykitjs";
-import { free, pro } from "./paykit-plans";
+import { free, pro } from "./paykit-products";
 
 export const paykit = createPayKit({
   database: process.env.DATABASE_URL!,
@@ -49,7 +49,7 @@ export const paykit = createPayKit({
     secretKey: process.env.STRIPE_SECRET_KEY!,
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
   }),
-  plans: [free, pro],
+  products: [free, pro],
   identify: async (request) => {
     return null;
   },
@@ -63,11 +63,11 @@ export const paykit = createPayKit({
     const written = await fs.readFile(configFullPath, "utf-8");
     expect(written).toContain("createPayKit");
     expect(written).toContain("@paykitjs/stripe");
-    expect(written).toContain("paykit-plans");
-    expect(written).toContain("plans: [free, pro]");
+    expect(written).toContain("paykit-products");
+    expect(written).toContain("products: [free, pro]");
 
     // Write plans file
-    const plansContent = `import { plan } from "paykitjs";
+    const productsContent = `import { plan } from "paykitjs";
 
 export const free = plan({
   id: "free",
@@ -83,11 +83,11 @@ export const pro = plan({
   price: { amount: 29, interval: "month" },
 });
 `;
-    await fs.writeFile(path.join(cwd, plansPath), plansContent);
+    await fs.writeFile(path.join(cwd, productsPath), productsContent);
 
-    const writtenPlans = await fs.readFile(path.join(cwd, plansPath), "utf-8");
-    expect(writtenPlans).toContain('id: "free"');
-    expect(writtenPlans).toContain('id: "pro"');
+    const writtenProducts = await fs.readFile(path.join(cwd, productsPath), "utf-8");
+    expect(writtenProducts).toContain('id: "free"');
+    expect(writtenProducts).toContain('id: "pro"');
 
     // Write route handler
     const routeContent = `import { paykitHandler } from "paykitjs/handlers/next";

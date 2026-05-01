@@ -13,7 +13,7 @@ This guide walks through implementing usage-based billing: how to define metered
 
 Metered features track usage against a limit. Define one with `type: "metered"`.
 
-```ts title="plans.ts"
+```ts title="products.ts"
 import { feature } from "paykitjs";
 
 const messages = feature({ id: "messages", type: "metered" });
@@ -27,7 +27,7 @@ const messages = feature({ id: "messages", type: "metered" });
 
 Pass the feature into each plan with a `limit` and `reset` interval.
 
-```ts title="plans.ts"
+```ts title="products.ts"
 export const free = plan({
   id: "free",
   name: "Free",

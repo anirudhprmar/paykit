@@ -134,7 +134,7 @@ export async function ensureDefaultPlansForCustomer(
   ctx: PayKitContext,
   customerId: string,
 ): Promise<void> {
-  const defaultPlans = ctx.plans.plans.filter((plan) => plan.isDefault);
+  const defaultPlans = ctx.products.plans.filter((plan) => plan.isDefault);
   if (defaultPlans.length === 0) {
     return;
   }

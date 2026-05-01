@@ -7,12 +7,12 @@ PayKit is built TypeScript-first. Plan IDs, feature IDs, and method inputs are i
 
 ## Inferred plan and feature IDs
 
-When you pass plans to `createPayKit`, all methods narrow their ID parameters to only accept valid values. Typos become compile errors.
+When you pass products to `createPayKit`, all methods narrow their ID parameters to only accept valid values. Typos become compile errors.
 
 ```ts title="paykit.ts"
-// Types are inferred from your plans
+// Types are inferred from your products
 export const paykit = createPayKit({
-  plans: [free, pro, ultra],
+  products: [free, pro, ultra],
   // ...
 });
 
@@ -60,18 +60,17 @@ await client.subscribe({ planId: "pro" }); // ✓ type-safe
 
 Plan IDs are validated on the client too. Passing an invalid `planId` is a compile error regardless of where you call it.
 
-## Module re-exports
+## Product arrays
 
-Plans can be passed as an array or as a module object. The module form is useful when you use `import * as plans` to gather all exports from a file.
+Pass products to `createPayKit` as an array of values returned by `plan(...)`.
 
 ```ts
-// Plans can also be passed as a module object
-import * as plans from "./plans";
+import { free, pro, ultra } from "./products";
 
 export const paykit = createPayKit({
-  plans,
+  products: [free, pro, ultra],
   // ...
 });
 ```
 
-Both forms produce identical type inference. PayKit normalizes the module object to an array internally.
+This preserves full plan and feature ID inference.

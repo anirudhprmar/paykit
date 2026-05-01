@@ -12,7 +12,7 @@ export interface PayKitContext {
   basePath: string;
   database: PayKitDatabase;
   provider: PaymentProvider;
-  plans: NormalizedSchema;
+  products: NormalizedSchema;
   logger: PayKitInternalLogger;
 }
 
@@ -42,7 +42,7 @@ export async function createContext(options: PayKitOptions): Promise<PayKitConte
     basePath,
     database,
     provider,
-    plans: normalizeSchema(options.plans),
+    products: normalizeSchema(options.products),
     logger: createPayKitLogger(options.logging),
   };
 }

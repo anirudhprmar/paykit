@@ -34,7 +34,7 @@
 
 ## What is PayKit?
 
-PayKit is an embedded billing framework for TypeScript apps. It sits inside your app, uses your database, and gives you a single API to manage plans, subscriptions, entitlements, and usage billing without touching provider dashboards.
+PayKit is an embedded billing framework for TypeScript apps. It sits inside your app, uses your database, and gives you a single API to manage products, subscriptions, entitlements, and usage billing without touching provider dashboards.
 
 ```ts
 import { stripe } from "@paykitjs/stripe";
@@ -62,7 +62,7 @@ export const paykit = createPayKit({
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
   }),
   database: process.env.DATABASE_URL!,
-  plans: [free, pro],
+  products: [free, pro],
 });
 ```
 

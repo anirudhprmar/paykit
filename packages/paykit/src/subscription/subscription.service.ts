@@ -96,7 +96,7 @@ async function resolveStoredPlanFeatures(
 
 export async function loadSubscribeContext(ctx: PayKitContext, input: SubscribeInput) {
   const providerId = ctx.provider.id;
-  const normalizedPlan = ctx.plans.planMap.get(input.planId);
+  const normalizedPlan = ctx.products.planMap.get(input.planId);
   const matchingProduct = input.productInternalId
     ? await getProductByInternalId(ctx.database, input.productInternalId)
     : normalizedPlan
@@ -403,7 +403,7 @@ async function ensureScheduledDefaultPlan(
     return;
   }
 
-  const normalizedPlan = ctx.plans.planMap.get(defaultPlan.id);
+  const normalizedPlan = ctx.products.planMap.get(defaultPlan.id);
   if (!normalizedPlan) {
     return;
   }
@@ -554,7 +554,9 @@ export async function applySubscriptionWebhookAction(
         return null;
       })()
     : null;
-  const normalizedPlan = storedProduct ? (ctx.plans.planMap.get(storedProduct.id) ?? null) : null;
+  const normalizedPlan = storedProduct
+    ? (ctx.products.planMap.get(storedProduct.id) ?? null)
+    : null;
 
   const providerData = {
     subscriptionId: action.data.subscription.providerSubscriptionId,

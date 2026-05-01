@@ -11,7 +11,7 @@ This guide walks through a complete subscription billing flow: defining plans, s
 
     Start by defining your plans. A typical setup has a free tier as the default and one or more paid tiers in the same group.
 
-    ```ts title="plans.ts"
+    ```ts title="products.ts"
     import { feature, plan } from "paykitjs";
 
     const messages = feature({ id: "messages", type: "metered" });
@@ -37,14 +37,14 @@ This guide walks through a complete subscription billing flow: defining plans, s
     });
     ```
 
-    Pass your plans to `createPayKit`:
+    Pass your products to `createPayKit`:
 
     ```ts title="paykit.ts"
-    import { free, pro } from "./plans";
+    import { free, pro } from "./products";
 
     export const paykit = createPayKit({
       // ...
-      plans: [free, pro],
+      products: [free, pro],
     });
     ```
 

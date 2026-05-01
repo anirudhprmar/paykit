@@ -85,7 +85,7 @@ export async function createCliFixture(_globalKey: string): Promise<CliTestFixtu
       `    secretKey: ${JSON.stringify(secretKey)},`,
       `    webhookSecret: ${JSON.stringify(webhookSecret)},`,
       `  }),`,
-      `  plans: { free, pro },`,
+      `  products: [free, pro],`,
       `});`,
     ].join("\n"),
   );

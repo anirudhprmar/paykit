@@ -156,7 +156,7 @@ export function HeroCodeBlock({
                       : "text-foreground/40 hover:text-foreground/60",
                   )}
                 >
-                  plans.ts
+                  products.ts
                   {activeTab === "plans" && (
                     <span className="bg-foreground/50 absolute right-2 bottom-0 left-2 h-px" />
                   )}

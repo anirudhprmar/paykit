@@ -36,7 +36,7 @@ function createTestContext() {
         name: "Stripe",
       },
     },
-    plans: { plans: [] },
+    products: { plans: [] },
     provider: {
       handleWebhook,
       id: "stripe",
