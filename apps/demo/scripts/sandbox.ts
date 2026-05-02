@@ -57,7 +57,7 @@ export async function runCommand(
   command: string,
   args: string[],
   cwd: string,
-  envOverrides?: NodeJS.ProcessEnv,
+  envOverrides?: Record<string, string | undefined>,
 ) {
   await new Promise<void>((resolve, reject) => {
     const child = spawn(command, args, {
