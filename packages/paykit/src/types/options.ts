@@ -35,3 +35,6 @@ export interface PayKitOptions {
   logging?: PayKitLoggingOptions;
   testing?: PayKitTestingOptions;
 }
+
+export type ExactOptions<TOptions extends PayKitOptions> = TOptions &
+  Record<Exclude<keyof TOptions, keyof PayKitOptions>, never>;

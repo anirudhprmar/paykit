@@ -5,8 +5,9 @@ import { createPayKitRouter, getApi } from "../api/methods";
 import { getPendingMigrationCount } from "../database/index";
 import { dryRunSyncProducts } from "../product/product-sync.service";
 import type { PayKitAPI, PayKitInstance } from "../types/instance";
-import type { PayKitOptions } from "../types/options";
+import type { ExactOptions, PayKitOptions } from "../types/options";
 import { createContext, type PayKitContext } from "./context";
+import { assertValidPayKitOptions } from "./validate-options";
 
 const payKitInstanceSymbol = Symbol.for("paykit.instance");
 
@@ -55,6 +56,8 @@ async function runDevChecks(ctx: PayKitContext, pool: Pool): Promise<void> {
 }
 
 async function initContext(options: PayKitOptions): Promise<PayKitContext> {
+  assertValidPayKitOptions(options);
+
   const pool =
     typeof options.database === "string"
       ? new Pool({ connectionString: options.database })
@@ -69,7 +72,7 @@ async function initContext(options: PayKitOptions): Promise<PayKitContext> {
 }
 
 export function createPayKit<const TOptions extends PayKitOptions>(
-  options: TOptions,
+  options: ExactOptions<TOptions>,
 ): PayKitInstance<TOptions> {
   let contextPromise: Promise<PayKitContext> | undefined;
   const getContext = () => {

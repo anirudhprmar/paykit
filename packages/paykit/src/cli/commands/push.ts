@@ -4,6 +4,7 @@ import * as p from "@clack/prompts";
 import { Command } from "commander";
 import picocolors from "picocolors";
 
+import { assertValidPayKitOptions } from "../../core/validate-options";
 import {
   checkActiveSubscriptionsOnOtherProvider,
   checkProvider,
@@ -28,6 +29,7 @@ async function pushAction(options: { config?: string; cwd: string; yes?: boolean
 
   const pm = deps.detectPackageManager(cwd);
   const config = await deps.getPayKitConfig({ configPath: options.config, cwd });
+  assertValidPayKitOptions(config.options, { configPath: config.path });
   const database = createPool(deps, config.options.database);
 
   try {
