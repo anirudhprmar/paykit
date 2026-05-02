@@ -6,7 +6,6 @@ import { getPendingMigrationCount } from "../database/index";
 import { dryRunSyncProducts } from "../product/product-sync.service";
 import type { PayKitAPI, PayKitInstance } from "../types/instance";
 import type { PayKitOptions } from "../types/options";
-import { checkPayKitDependencies } from "../utilities/dependencies/index";
 import { createContext, type PayKitContext } from "./context";
 
 const payKitInstanceSymbol = Symbol.for("paykit.instance");
@@ -20,11 +19,19 @@ export function isPayKitInstance(value: unknown): value is PayKitInstance {
 }
 
 const _global = globalThis as unknown as { __paykitDevChecksRan?: boolean };
+const dynamicImport = new Function("specifier", "return import(specifier)") as (
+  specifier: string,
+) => Promise<unknown>;
 
 async function runDevChecks(ctx: PayKitContext, pool: Pool): Promise<void> {
   if (_global.__paykitDevChecksRan) return;
   _global.__paykitDevChecksRan = true;
   if (process.env.PAYKIT_DISABLE_DEPENDENCY_CHECKER !== "1") {
+    const { checkPayKitDependencies } = (await dynamicImport(
+      ["..", "utilities", "dependencies", "index.js"].join("/"),
+    )) as {
+      checkPayKitDependencies: () => Promise<void>;
+    };
     await checkPayKitDependencies();
   }
 
