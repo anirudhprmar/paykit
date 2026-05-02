@@ -21,7 +21,7 @@ import { env } from "./env";
 import { loadHarness } from "./harness/index";
 import type { ProviderHarness } from "./harness/types";
 import { HUB_PORT, registerCustomer, unregisterCustomers } from "./hub";
-import { allPlans } from "./products";
+import { allProducts } from "./products";
 
 // Provider harness — loaded once at module init based on PROVIDER env var
 export const harness: ProviderHarness = loadHarness();
@@ -29,7 +29,7 @@ export const harness: ProviderHarness = loadHarness();
 type TestPayKitInstance = ReturnType<
   typeof createPayKit<{
     database: Pool;
-    plans: typeof allPlans;
+    products: typeof allProducts;
     provider: ReturnType<typeof harness.createProviderConfig>;
     testing: { enabled: true };
   }>
@@ -89,7 +89,7 @@ export async function createTestPayKit(): Promise<TestPayKit> {
   const providerConfig = harness.createProviderConfig();
   const paykit = createPayKit({
     database: pool,
-    plans: allPlans,
+    products: allProducts,
     provider: providerConfig,
     testing: { enabled: true },
   });

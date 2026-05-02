@@ -58,11 +58,19 @@ function findExistingFile(cwd: string, candidates: string[]): string | null {
 }
 
 function generateConfigFile(templateId: string, includeIdentify: boolean): string {
-  const planImports =
-    templateId === "saas-starter" ? "free, pro" : templateId === "usage-based" ? "free, pro" : "";
+  const productImports =
+    templateId === "saas-starter"
+      ? ["free", "pro"]
+      : templateId === "usage-based"
+        ? ["free", "pro"]
+        : [];
 
-  const plansLine = planImports ? `\n  plans: [${planImports}],` : "\n  plans: [],";
-  const importLine = planImports ? `\nimport { ${planImports} } from "./paykit-plans";` : "";
+  const productsLine = productImports.length
+    ? `\n  products: [${productImports.join(", ")}],`
+    : "\n  products: [],";
+  const importLine = productImports.length
+    ? `\nimport { ${productImports.join(", ")} } from "./paykit-products";`
+    : "";
 
   const identifyBlock = includeIdentify
     ? `
@@ -87,7 +95,80 @@ export const paykit = createPayKit({
   provider: stripe({
     secretKey: process.env.STRIPE_SECRET_KEY!,
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
-  }),${plansLine}${identifyBlock}
+  }),${productsLine}${identifyBlock}
+});
+`;
+}
+
+function detectExistingProductsModule(content: string): string[] | null {
+  const namedExports = Array.from(
+    content.matchAll(/export const\s+([a-zA-Z0-9_]+)\s*=/g),
+    (match) => {
+      const exportName = match[1];
+      return exportName ?? "";
+    },
+  ).filter((exportName) => exportName.length > 0);
+  if (namedExports.length > 0) {
+    return namedExports;
+  }
+
+  const reExportMatch = content.match(/export\s*\{([^}]+)\}/);
+  if (!reExportMatch) {
+    return null;
+  }
+
+  const reExportList = reExportMatch[1] ?? "";
+
+  return reExportList
+    .split(",")
+    .map((part) => {
+      const aliases = part
+        .trim()
+        .split(/\s+as\s+/i)
+        .map((entry) => entry.trim())
+        .filter((entry) => entry.length > 0);
+      return aliases[1] ?? aliases[0] ?? "";
+    })
+    .filter((part): part is string => Boolean(part));
+}
+
+function generateConfigFileFromProductsModule(
+  productNames: string[],
+  includeIdentify: boolean,
+  productsImportPath = "./paykit-products",
+): string {
+  const uniqueProductNames = Array.from(new Set(productNames));
+  const productsLine = uniqueProductNames.length
+    ? `\n  products: [${uniqueProductNames.join(", ")}],`
+    : "\n  products: [],";
+  const importLine = uniqueProductNames.length
+    ? `\nimport { ${uniqueProductNames.join(", ")} } from "${productsImportPath}";`
+    : "";
+
+  const identifyBlock = includeIdentify
+    ? `
+  identify: async (request) => {
+    // Replace with your auth logic, for example:
+    // const session = await auth.api.getSession({ headers: request.headers });
+    // if (!session) return null;
+    // return {
+    //   customerId: session.user.id,
+    //   email: session.user.email,
+    //   name: session.user.name,
+    // };
+    return null;
+  },`
+    : "";
+
+  return `import { stripe } from "@paykitjs/stripe";
+import { createPayKit } from "paykitjs";${importLine}
+
+export const paykit = createPayKit({
+  database: process.env.DATABASE_URL!,
+  provider: stripe({
+    secretKey: process.env.STRIPE_SECRET_KEY!,
+    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
+  }),${productsLine}${identifyBlock}
 });
 `;
 }
@@ -354,11 +435,32 @@ async function initAction(options: { cwd: string; defaults: boolean }): Promise<
     }
   }
 
-  const plansPath = configPath.replace(/paykit(\.config)?\.ts$/, "paykit-plans.ts");
-  const plansFullPath = path.join(cwd, plansPath);
+  const productsPath = configPath.replace(/paykit(\.config)?\.ts$/, "paykit-products.ts");
+  const productsFullPath = path.join(cwd, productsPath);
+  const legacyProductsPath = configPath.replace(/paykit(\.config)?\.ts$/, "paykit-plans.ts");
+  const legacyProductsFullPath = path.join(cwd, legacyProductsPath);
   let templateId: string | symbol = "saas-starter";
+  const hasProductsModule = fs.existsSync(productsFullPath);
+  const hasLegacyProductsModule = fs.existsSync(legacyProductsFullPath);
+  const existingProductsModule = hasProductsModule
+    ? detectExistingProductsModule(fs.readFileSync(productsFullPath, "utf8"))
+    : hasLegacyProductsModule
+      ? detectExistingProductsModule(fs.readFileSync(legacyProductsFullPath, "utf8"))
+      : null;
+  const existingProductsImportPath = hasProductsModule
+    ? "./paykit-products"
+    : hasLegacyProductsModule
+      ? "./paykit-plans"
+      : "./paykit-products";
 
-  if (!fs.existsSync(plansFullPath) && !useDefaults) {
+  if ((hasProductsModule || hasLegacyProductsModule) && existingProductsModule === null) {
+    p.cancel(
+      `Could not parse ${hasProductsModule ? productsPath : legacyProductsPath}. Update the module exports or regenerate it before running init again.`,
+    );
+    process.exit(1);
+  }
+
+  if (!hasProductsModule && !hasLegacyProductsModule && !useDefaults) {
     templateId = await p.select({
       message: "Select pricing template",
       options: templates.map((t) => ({
@@ -398,18 +500,24 @@ async function initAction(options: { cwd: string; defaults: boolean }): Promise<
   const files: FileToWrite[] = [];
 
   // Config
-  if (!existingConfig) {
+  if (!existingConfig || hasLegacyProductsModule) {
     files.push({
       path: configPath,
-      content: generateConfigFile(templateId as string, clientPath !== null),
+      content: existingProductsModule
+        ? generateConfigFileFromProductsModule(
+            existingProductsModule,
+            clientPath !== null,
+            existingProductsImportPath,
+          )
+        : generateConfigFile(templateId as string, clientPath !== null),
     });
   }
 
   // Plans
-  if (!fs.existsSync(plansFullPath)) {
+  if (!hasProductsModule && !hasLegacyProductsModule) {
     const template = templates.find((t) => t.id === templateId);
     if (template) {
-      files.push({ path: plansPath, content: template.content });
+      files.push({ path: productsPath, content: template.content });
     }
   }
 
@@ -475,7 +583,7 @@ async function initAction(options: { cwd: string; defaults: boolean }): Promise<
       `   ${c("•")} Check status: ${b(`${exec} paykitjs status`)}`,
       `   ${c("•")} Sync updated products: ${b(`${exec} paykitjs push`)}`,
       `   ${c("•")} Add AI skills: ${b(`${getDlxPrefix(pm)} skills add getpaykit/skills`)}`,
-      `   ${c("•")} Forward dev webhooks: ${b("stripe listen --forward-to localhost:3000/paykit/api/webhook/stripe")}`,
+      `   ${c("•")} Forward dev webhooks: ${b("stripe listen --forward-to localhost:3000/paykit/webhook")}`,
       "",
       `   Please star us on github ${c("<3")}`,
       `   ${c("https://paykit.sh/github")}`,

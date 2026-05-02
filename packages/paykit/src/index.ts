@@ -51,7 +51,7 @@ export type {
   PayKitFeatureInclude,
   PayKitPlan,
   PayKitPlanConfig,
-  PayKitPlansModule,
+  PayKitProductsModule,
   PlanPrice,
   PriceInterval,
 } from "./types/schema";

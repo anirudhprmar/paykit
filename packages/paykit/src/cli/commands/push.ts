@@ -95,7 +95,7 @@ async function pushAction(options: { config?: string; cwd: string; yes?: boolean
     );
 
     if (diffs.length > 0) {
-      const planLines = formatProductDiffs(diffs, ctx.plans.plans, deps);
+      const planLines = formatProductDiffs(diffs, ctx.products.plans, deps);
       p.log.info(`Products\n${planLines.join("\n")}`);
     }
 

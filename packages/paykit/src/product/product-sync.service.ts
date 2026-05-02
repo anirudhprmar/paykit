@@ -65,7 +65,7 @@ function planChanged(
 export async function dryRunSyncProducts(ctx: PayKitContext): Promise<SyncProductResult[]> {
   const results: SyncProductResult[] = [];
 
-  for (const plan of ctx.plans.plans) {
+  for (const plan of ctx.products.plans) {
     const existing = await getLatestProductSnapshot(ctx.database, plan.id);
     let action: SyncProductResult["action"] = "unchanged";
 
@@ -91,7 +91,7 @@ export async function syncProducts(ctx: PayKitContext): Promise<SyncProductResul
   const results: SyncProductResult[] = [];
   const providerId = ctx.provider.id;
 
-  for (const schemaFeature of ctx.plans.features) {
+  for (const schemaFeature of ctx.products.features) {
     await upsertFeature(ctx.database, schemaFeature);
   }
 
@@ -104,7 +104,7 @@ export async function syncProducts(ctx: PayKitContext): Promise<SyncProductResul
     storedProductInternalId: string;
   }> = [];
 
-  for (const plan of ctx.plans.plans) {
+  for (const plan of ctx.products.plans) {
     const existing = await getLatestProductSnapshot(ctx.database, plan.id);
     const existingProviderProduct = existing
       ? await getProviderProduct(ctx.database, existing.product.internalId, providerId)

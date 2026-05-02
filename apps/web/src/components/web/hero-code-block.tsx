@@ -61,7 +61,7 @@ const pushSteps: PushStep[] = [
   {
     segments: [
       { text: "◇", color: green },
-      { text: " Plan changes", color: normal },
+      { text: " Product changes", color: normal },
     ],
     type: "line",
   },
@@ -85,7 +85,7 @@ const pushSteps: PushStep[] = [
   {
     segments: [
       { text: "◆", color: green },
-      { text: " Plans synced", color: normal },
+      { text: " Products synced", color: normal },
     ],
     type: "line",
   },
@@ -93,7 +93,7 @@ const pushSteps: PushStep[] = [
   {
     segments: [
       { text: "●", color: green },
-      { text: " Done · 2 plans synced", color: normal },
+      { text: " Done · 2 products synced", color: normal },
     ],
     type: "line",
   },
@@ -156,7 +156,7 @@ export function HeroCodeBlock({
                       : "text-foreground/40 hover:text-foreground/60",
                   )}
                 >
-                  plans.ts
+                  products.ts
                   {activeTab === "plans" && (
                     <span className="bg-foreground/50 absolute right-2 bottom-0 left-2 h-px" />
                   )}

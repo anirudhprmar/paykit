@@ -4,7 +4,7 @@ import type { LevelWithSilent, Logger } from "pino";
 import type { PayKitProviderConfig } from "../providers/provider";
 import type { PayKitEventHandlers } from "./events";
 import type { PayKitPlugin } from "./plugin";
-import type { PayKitPlansModule } from "./schema";
+import type { PayKitProductsModule } from "./schema";
 
 export interface PayKitLoggingOptions {
   level?: LevelWithSilent;
@@ -18,7 +18,12 @@ export interface PayKitTestingOptions {
 export interface PayKitOptions {
   database: Pool | string;
   provider: PayKitProviderConfig;
-  plans?: PayKitPlansModule;
+  products?: PayKitProductsModule;
+  /**
+   * PayKit root path, e.g. `/paykit` or `/billing`.
+   * API routes are exposed under `${basePath}/api` and webhooks under `${basePath}/webhook`.
+   * @default "/paykit"
+   */
   basePath?: string;
   identify?: (request: Request) => Promise<{
     customerId: string;

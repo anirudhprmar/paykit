@@ -9,9 +9,10 @@ import { createPayKitLogger, type PayKitInternalLogger } from "./logger";
 
 export interface PayKitContext {
   options: PayKitOptions;
+  basePath: string;
   database: PayKitDatabase;
   provider: PaymentProvider;
-  plans: NormalizedSchema;
+  products: NormalizedSchema;
   logger: PayKitInternalLogger;
 }
 
@@ -34,12 +35,14 @@ export async function createContext(options: PayKitOptions): Promise<PayKitConte
       : options.database;
   const database = await createDatabase(pool);
   const provider = options.provider.createAdapter();
+  const basePath = options.basePath ?? "/paykit";
 
   return {
     options,
+    basePath,
     database,
     provider,
-    plans: normalizeSchema(options.plans),
+    products: normalizeSchema(options.products),
     logger: createPayKitLogger(options.logging),
   };
 }

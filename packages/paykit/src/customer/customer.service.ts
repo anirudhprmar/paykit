@@ -134,7 +134,7 @@ export async function ensureDefaultPlansForCustomer(
   ctx: PayKitContext,
   customerId: string,
 ): Promise<void> {
-  const defaultPlans = ctx.plans.plans.filter((plan) => plan.isDefault);
+  const defaultPlans = ctx.products.plans.filter((plan) => plan.isDefault);
   if (defaultPlans.length === 0) {
     return;
   }
@@ -401,7 +401,8 @@ export async function upsertProviderCustomer(
     providerCustomer = { ...existingProviderCustomer!, id: existingProviderCustomerId };
   } else {
     const result = await ctx.provider.createCustomer({
-      createTestClock: ctx.options.testing?.enabled === true,
+      createTestClock:
+        ctx.options.testing?.enabled === true && ctx.provider.capabilities.testClocks,
       id: existingCustomer.id,
       email: existingCustomer.email ?? undefined,
       name: existingCustomer.name ?? undefined,
