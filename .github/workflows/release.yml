@@ -59,7 +59,7 @@ jobs:
         shell: bash
         run: |
           for package_dir in packages/paykit packages/polar packages/stripe; do
-            (cd "$package_dir" && bun publish --access public --tag "${{ steps.npm_tag.outputs.tag }}")
+            (cd "$package_dir/dist" && bun publish --access public --tag "${{ steps.npm_tag.outputs.tag }}")
           done
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -19,34 +19,34 @@
     "url": "git+https://github.com/getpaykit/paykit.git"
   },
   "bin": {
-    "paykitjs": "./dist/cli/index.js"
+    "paykitjs": "./src/cli/index.ts"
   },
   "files": [
     "dist"
   ],
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
       "paykit-source": "./src/index.ts",
-      "default": "./dist/index.js"
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
     },
     "./handlers/next": {
-      "types": "./dist/handlers/next.d.ts",
       "paykit-source": "./src/handlers/next.ts",
-      "default": "./dist/handlers/next.js"
+      "types": "./src/handlers/next.ts",
+      "default": "./src/handlers/next.ts"
     },
     "./client": {
-      "types": "./dist/client/index.d.ts",
       "paykit-source": "./src/client/index.ts",
-      "default": "./dist/client/index.js"
+      "types": "./src/client/index.ts",
+      "default": "./src/client/index.ts"
     },
     "./database": {
-      "types": "./dist/database/schema.d.ts",
       "paykit-source": "./src/database/schema.ts",
-      "default": "./dist/database/schema.js"
+      "types": "./src/database/schema.ts",
+      "default": "./src/database/schema.ts"
     }
   },
   "scripts": {
@@ -56,6 +56,7 @@
   },
   "dependencies": {
     "@better-fetch/fetch": "^1.1.21",
+    "@types/pg": "^8.18.0",
     "@clack/prompts": "^1.1.0",
     "better-call": "^2.0.2",
     "commander": "^12.1.0",
@@ -71,7 +72,6 @@
     "zod": "^4.0.0"
   },
   "devDependencies": {
-    "@types/pg": "^8.18.0",
     "drizzle-kit": "^0.31.5",
     "tsdown": "^0.21.1",
     "vitest": "^4.0.18"
