@@ -6,7 +6,7 @@ import { env } from "@/env";
 
 const resend = new Resend(env.RESEND_API_KEY);
 
-export async function submitEnterpriseForm(formData: FormData) {
+export async function submitContactForm(formData: FormData) {
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
   const company = formData.get("company") as string;
@@ -17,11 +17,11 @@ export async function submitEnterpriseForm(formData: FormData) {
   }
 
   try {
-    await resend.emails.send({
+    const response = await resend.emails.send({
       from: env.RESEND_FROM_EMAIL,
       to: env.RESEND_TO_EMAIL,
       replyTo: email,
-      subject: `Enterprise inquiry from ${name} at ${company}`,
+      subject: `Contact inquiry from ${name} at ${company}`,
       text: [
         `Name: ${name}`,
         `Email: ${email}`,
@@ -32,8 +32,19 @@ export async function submitEnterpriseForm(formData: FormData) {
         .join("\n"),
     });
 
+    if (response.error) {
+      console.error("Failed to send contact inquiry", {
+        error: response.error,
+        headers: response.headers,
+      });
+
+      return { error: "Something went wrong. Please try again or email us directly." };
+    }
+
     return { success: true };
-  } catch {
+  } catch (error) {
+    console.error("Unexpected contact inquiry error", error);
+
     return { error: "Something went wrong. Please try again or email us directly." };
   }
 }

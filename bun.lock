@@ -174,11 +174,12 @@
       "name": "paykitjs",
       "version": "0.0.4",
       "bin": {
-        "paykitjs": "./dist/cli/index.js",
+        "paykitjs": "./src/cli/index.ts",
       },
       "dependencies": {
         "@better-fetch/fetch": "^1.1.21",
         "@clack/prompts": "^1.1.0",
+        "@types/pg": "^8.18.0",
         "better-call": "^2.0.2",
         "commander": "^12.1.0",
         "dotenv": "^17.3.1",
@@ -193,7 +194,6 @@
         "zod": "^4.0.0",
       },
       "devDependencies": {
-        "@types/pg": "^8.18.0",
         "drizzle-kit": "^0.31.5",
         "tsdown": "^0.21.1",
         "vitest": "^4.0.18",

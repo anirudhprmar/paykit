@@ -9,12 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-import { submitEnterpriseForm } from "./actions";
+import { submitContactForm } from "./actions";
 
-export function EnterpriseForm() {
+export function ContactForm() {
   const [state, formAction, pending] = useActionState(
     async (_prev: { success?: boolean; error?: string } | null, formData: FormData) => {
-      return submitEnterpriseForm(formData);
+      return submitContactForm(formData);
     },
     null,
   );
