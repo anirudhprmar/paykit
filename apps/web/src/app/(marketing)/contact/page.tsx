@@ -15,7 +15,7 @@ export default function ContactPage() {
   return (
     <div className="flex min-h-dvh flex-col">
       <Section className="flex-1">
-        <SectionContent className="px-12 pt-24 pb-24 lg:pt-36">
+        <SectionContent className="px-12 pt-24 pb-24 sm:pt-24 sm:pb-24 md:pt-32 md:pb-24 lg:px-12 lg:pt-36 lg:pb-24">
           <div className="mx-auto max-w-lg">
             <div className="space-y-3 text-center">
               <h1 className="text-foreground/90 text-2xl font-semibold tracking-tight sm:text-3xl">
