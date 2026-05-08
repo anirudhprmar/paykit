@@ -9,6 +9,18 @@ function headersToRecord(headers: Headers): Record<string, string> {
   return result;
 }
 
+function shouldAllowStaleSignatures(headers: Headers): boolean {
+  if (headers.get("x-paykit-cloud-replay") !== "1") {
+    return false;
+  }
+
+  return (
+    process.env.PAYKIT_ALLOW_STALE_SIGNATURES === "1" ||
+    process.env.NODE_ENV === "development" ||
+    process.env.NODE_ENV === "test"
+  );
+}
+
 /** Applies an incoming provider webhook payload. */
 export const receiveWebhook = definePayKitMethod(
   {
@@ -18,10 +30,14 @@ export const receiveWebhook = definePayKitMethod(
       path: "/webhook",
       requireHeaders: true,
       requireRequest: true,
-      resolveInput: async (ctx) => ({
-        body: await ctx.request!.text(),
-        headers: headersToRecord(ctx.headers ?? new Headers()),
-      }),
+      resolveInput: async (ctx) => {
+        const headers = ctx.headers ?? new Headers();
+        return {
+          allowStaleSignatures: shouldAllowStaleSignatures(headers),
+          body: await ctx.request!.text(),
+          headers: headersToRecord(headers),
+        };
+      },
     },
   },
   // TODO: if we'll add multiple providers on one app, we gotta make sure detecting provider based on request HERE
