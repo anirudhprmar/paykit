@@ -28,3 +28,4 @@ APIs.
 - When generating migrations, always provide a name.
 - Never edit past migrations; create a new migration instead.
 - Never run "deploy" scripts to test anything, only if explicitly asked
+- NEVER EVER publish or release packages yourself, ask double confirmation
