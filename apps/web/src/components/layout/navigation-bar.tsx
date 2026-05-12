@@ -113,16 +113,19 @@ export function NavigationBar({ stars: _stars }: { stars: number | null }) {
         >
           <SectionShell className="flex items-center justify-between">
             <BrandMenu linkClassName="gap-1 px-5 py-3" wordmarkClassName="scale-95" />
-            <button
-              type="button"
-              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-              aria-controls="mobile-navigation-menu"
-              aria-expanded={mobileMenuOpen}
-              onClick={() => setMobileMenuOpen((prev) => !prev)}
-              className="text-foreground/65 dark:text-foreground/50 hover:text-foreground/80 px-5 py-3 transition-colors"
-            >
-              {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
-            </button>
+            <div className="flex items-center justify-center">
+              <ThemeToggle />
+              <button
+                type="button"
+                aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+                aria-controls="mobile-navigation-menu"
+                aria-expanded={mobileMenuOpen}
+                onClick={() => setMobileMenuOpen((prev) => !prev)}
+                className="text-foreground/65 dark:text-foreground/50 hover:text-foreground/80 px-5 py-3 transition-colors"
+              >
+                {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+              </button>
+            </div>
           </SectionShell>
         </motion.div>
 
@@ -148,7 +151,11 @@ export function NavigationBar({ stars: _stars }: { stars: number | null }) {
                         key={item.name}
                         initial={{ opacity: 0, y: -4 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2, delay: 0.05 + i * 0.03, ease: "easeOut" }}
+                        transition={{
+                          duration: 0.2,
+                          delay: 0.05 + i * 0.03,
+                          ease: "easeOut",
+                        }}
                       >
                         <NavLink
                           item={item}
