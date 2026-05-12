@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { BrandMenu } from "@/components/web/brand-menu";
 import { URLs } from "@/lib/consts";
 
+import { ThemeToggle } from "../theme-toggle";
+
 // ─── Shared nav link ─────────────────────────────────────────────────
 
 interface NavItem {
@@ -223,6 +225,7 @@ export function NavigationBar({ stars: _stars }: { stars: number | null }) {
                   <Github className="size-3.5" />
                   <span>GitHub</span>
                 </Button>
+                <ThemeToggle />
               </div>
             </div>
           </SectionShell>
