@@ -20,7 +20,7 @@ export const URLs = {
   linkedin: "https://www.linkedin.com/company/paykit-sh",
   discord: "https://discord.gg/nzy9NPpFNU",
   authorGitHub: "https://github.com/maxktz",
-  authorX: "https://x.com/maxk4tz",
+  authorX: "https://x.com/maxktz",
 } as const;
 
 export const VERSION_TEXT = "v0.1 beta";
