@@ -5,9 +5,9 @@ import type { ReactNode } from "react";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 
 import { ReleaseContributors } from "@/components/changelog/release-contributors";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 import { extractContributors } from "./releases";
@@ -77,7 +77,10 @@ export function ReleaseBody({ body }: { body: string }) {
             isCollapsible && !expanded && "max-h-64",
           )}
         >
-          <ReactMarkdown rehypePlugins={[rehypeRaw]} components={markdownComponents}>
+          <ReactMarkdown
+            rehypePlugins={[rehypeRaw, [rehypeSanitize, defaultSchema]]}
+            components={markdownComponents}
+          >
             {body}
           </ReactMarkdown>
 

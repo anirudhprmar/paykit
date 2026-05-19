@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { Badge } from "@/components/ui/badge";
 import { ReleaseBody } from "@/lib/html-parser";
 import type { GitHubRelease } from "@/lib/releases";
 import { formatReleaseDate } from "@/lib/releases";

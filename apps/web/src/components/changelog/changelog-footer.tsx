@@ -4,7 +4,6 @@ import { ArrowRight, Github } from "lucide-react";
 import Link from "next/link";
 
 import { Icons } from "@/components/icons";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { URLs } from "@/lib/consts";
 import { cn } from "@/lib/utils";
 
@@ -79,10 +78,6 @@ export function ChangelogFooter({ className }: ChangelogFooterProps) {
                 <Github className="size-3.5" />
               </Link>
             </div>
-            {/* <span className="text-foreground/15 hidden h-3 w-px bg-border sm:block" aria-hidden />
-            <div className="text-foreground/40 [&_button]:size-8 [&_button]:p-0">
-              <ThemeToggle />
-            </div> */}
           </div>
         </div>
       </div>
