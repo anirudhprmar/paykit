@@ -6,7 +6,7 @@ import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 
-import { ReleaseContributors } from "@/app/changelog/_components/release-contributors";
+import { ReleaseContributors } from "@/components/changelog/release-contributors";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 

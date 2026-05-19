@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
-import { ChangelogFooter } from "@/app/changelog/_components/changelog-footer";
-import { ChangelogRelease } from "@/app/changelog/_components/changelog-release";
-import { ChangelogSidebar } from "@/app/changelog/_components/changelog-sidebar";
+import { ChangelogFooter } from "@/components/changelog/changelog-footer";
+import { ChangelogRelease } from "@/components/changelog/changelog-release";
+import { ChangelogSidebar } from "@/components/changelog/changelog-sidebar";
 import { SectionShell } from "@/components/layout/section";
 import { getReleases } from "@/lib/github";
 import type { GitHubRelease } from "@/lib/releases";
