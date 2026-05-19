@@ -74,5 +74,9 @@
       "tailwindcss": "^4.1.18",
       "tailwindcss-animate": "^1.0.7"
     }
+  },
+  "dependencies": {
+    "react-markdown": "^10.1.0",
+    "rehype-raw": "^7.0.0"
   }
 }
