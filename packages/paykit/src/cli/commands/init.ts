@@ -148,7 +148,7 @@ function generateConfigFile(
 
   return `${providerImport(provider)}
 import { createPayKit } from "paykitjs";${importLine}
-${includeIdentify && useBetterAuthIdentify ? `import { auth } from "${useBetterAuthIdentify};"` : ""}
+${includeIdentify && useBetterAuthIdentify ? `import { auth } from "${useBetterAuthIdentify}";` : ""}
 
 export const paykit = createPayKit({
   database: process.env.DATABASE_URL!,
@@ -208,7 +208,7 @@ function generateConfigFileFromProductsModule(
 
   return `${providerImport(provider)}
 import { createPayKit } from "paykitjs";${importLine}
-${includeIdentify && useBetterAuthIdentify ? `import { auth } from "${useBetterAuthIdentify};"` : ""}
+${includeIdentify && useBetterAuthIdentify ? `import { auth } from "${useBetterAuthIdentify}";` : ""}
 
 export const paykit = createPayKit({
   database: process.env.DATABASE_URL!,
@@ -563,9 +563,9 @@ async function initAction(options: { cwd: string; defaults: boolean }): Promise<
 
   const files: FileToWrite[] = [];
 
-  usesBetterAuth && existingBetterAuthConfig
-    ? p.log.step(`Detected Better Auth: ${picocolors.bold(existingBetterAuthConfig)}`)
-    : null;
+  if (usesBetterAuth && existingBetterAuthConfig) {
+    p.log.step(`Detected Better Auth: ${picocolors.bold(existingBetterAuthConfig)}`);
+  }
 
   // Config
   if (!existingConfig || hasLegacyProductsModule) {
